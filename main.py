@@ -98,6 +98,26 @@ async def summarize(start_date, end_date, category=None):  # Changed: added asyn
     except Exception as e:
         return {"status": "error", "message": f"Error summarizing expenses: {str(e)}"}
 
+
+
+@mcp.tool()
+async def delete_expense(expense_id: int):
+    """Delete an expense entry by its ID."""
+    try:
+        async with aiosqlite.connect(DB_PATH) as c:
+            cur = await c.execute(
+                "DELETE FROM expenses WHERE id = ?",
+                (expense_id,)
+            )
+            await c.commit()
+            if cur.rowcount > 0:
+                return {"status": "success", "message": f"Expense {expense_id} deleted successfully"}
+            else:
+                return {"status": "error", "message": f"No expense found with ID {expense_id}"}
+    except Exception as e:
+        return {"status": "error", "message": f"Error deleting expense: {str(e)}"}
+
+
 @mcp.resource("expense:///categories", mime_type="application/json")  # Changed: expense:// → expense:///
 def categories():
     try:
@@ -125,6 +145,8 @@ def categories():
             return json.dumps(default_categories, indent=2)
     except Exception as e:
         return f'{{"error": "Could not load categories: {str(e)}"}}'
+    
+
 
 # Start the server
 if __name__ == "__main__":
