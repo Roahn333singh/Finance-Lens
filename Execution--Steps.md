@@ -29,5 +29,11 @@ uv run main.py
 uv run fastmcp dev main.py
 ```
 
+## Add MCP client
+
+```bash
+uv run fastmcp install claude-desktop main.py 
+```
+
 
 
